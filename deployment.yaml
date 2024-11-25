@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask
+  template:
+    metadata:
+      labels:
+        app: flask
+    spec:
+      containers:
+        - name: flask-app
+          image: your-dockerhub-zoro8/flask-app:tagname       # Replace with your new image tag
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DB_HOST
+              value: mysql  # Refers to the MySQL service
+            - name: DB_USER
+              value: flask_user
+            - name: DB_PASSWORD
+              value: flask_password
+            - name: DB_NAME
+              value: flask_db
+      imagePullSecrets:
+        - name: regsecret  
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-service
+spec:
+  selector:
+    app: flask
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+  type: NodePort
